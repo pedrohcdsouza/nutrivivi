@@ -37,6 +37,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'apps.health',
+    'apps.anamneses',
 ]
 
 MIDDLEWARE = [
