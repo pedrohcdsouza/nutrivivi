@@ -1,0 +1,28 @@
+{
+  "name": "nutrivivi",
+  "version": "1.0.0",
+  "description": "O projeto **Nutrivivi** é um sistema web completo para uma nutricionista.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedrohcdsouza/nutrivivi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pedrohcdsouza/nutrivivi/issues"
+  },
+  "homepage": "https://github.com/pedrohcdsouza/nutrivivi#readme",
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  }
+}
