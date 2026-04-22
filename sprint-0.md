@@ -36,10 +36,10 @@ Inicializar o projeto **Nutrivivi** estabelecendo o controle de versão, a estru
 
 ## ✅ Critérios de Aceite (Definition of Done)
 
-- [ ] Repositório Git local inicializado e sincronizado com o repositório remoto.
-- [ ] Estrutura de pastas `backend/`, `frontend/` e `infra/` existente no branch `main`.
-- [ ] O arquivo `README.md` descreve o projeto adequadamente.
-- [ ] Arquivos `.gitignore` e `.editorconfig` configurados e comitados.
-- [ ] É impossível realizar um commit com uma mensagem fora do padrão Conventional Commits graças aos git hooks (ex: commitlint).
-- [ ] É impossível realizar um commit com código mal formatado (pre-commit roda com sucesso barrando erros).
-- [ ] A pipeline de CI (GitHub Actions ou similar) foi criada e roda (passando com sucesso) em qualquer PR aberto contra a branch `main`.
+- [x] Repositório Git local inicializado e sincronizado com o repositório remoto.
+- [x] Estrutura de pastas `backend/`, `frontend/` e `infra/` existente no branch `main`.
+- [x] O arquivo `README.md` descreve o projeto adequadamente.
+- [x] Arquivos `.gitignore` e `.editorconfig` configurados e comitados.
+- [x] É impossível realizar um commit com uma mensagem fora do padrão Conventional Commits graças aos git hooks (ex: commitlint).
+- [x] É impossível realizar um commit com código mal formatado (pre-commit roda com sucesso barrando erros).
+- [x] A pipeline de CI (GitHub Actions ou similar) foi criada e roda (passando com sucesso) em qualquer PR aberto contra a branch `main`.
