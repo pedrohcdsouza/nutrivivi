@@ -1,5 +1,6 @@
 from django.db import transaction
-from rest_framework import generics
+from rest_framework import generics, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import AllowAny
 from apps.notifications.services import send_anamnese_notification
 from .models import Anamnese
@@ -37,6 +38,13 @@ class AdminAnamneseListAPIView(generics.ListAPIView):
     queryset = Anamnese.objects.all()
     serializer_class = AnamneseListSerializer
     permission_classes = [AllowAny]
+    
+    # Configuração de Filtros e Busca
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['notification_status']
+    search_fields = ['full_name']
+    ordering_fields = ['created_at', 'full_name']
+    ordering = ['-created_at']
 
 
 class AdminAnamneseDetailAPIView(generics.RetrieveAPIView):

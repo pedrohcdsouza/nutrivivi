@@ -1,34 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, Tag, Typography, Button, Space, message, Card } from "antd";
-import { EyeOutlined } from "@ant-design/icons";
+import { Table, Tag, Typography, Button, Space, message, Card, Input } from "antd";
+import { EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { getAnamneses } from "@/lib/api/admin";
 
 const { Title } = Typography;
+const { Search } = Input;
 
 export default function PainelAnamneses() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(searchText);
+  }, [searchText]);
 
-  const fetchData = async () => {
+  const fetchData = async (search: string = "") => {
     setLoading(true);
     try {
-      const response = await getAnamneses();
-      // Em DRF ListAPIView sem paginação, ele retorna uma lista direta.
-      // Se usar pagination, ele retornaria { count, next, previous, results }.
-      // Aqui tratamos se é lista ou objeto paginado:
+      const response = await getAnamneses(search);
       setData(response.results || response);
     } catch (error: any) {
       message.error(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchText(value);
   };
 
   const columns = [
@@ -80,7 +83,17 @@ export default function PainelAnamneses() {
   return (
     <Card bordered={false}>
       <Space direction="vertical" style={{ width: "100%" }} size="large">
-        <Title level={2}>Gerenciar Anamneses</Title>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Title level={2} style={{ margin: 0 }}>Gerenciar Anamneses</Title>
+          <Search
+            placeholder="Buscar paciente por nome..."
+            allowClear
+            onSearch={handleSearch}
+            style={{ width: 300 }}
+            enterButton={<SearchOutlined />}
+            size="large"
+          />
+        </div>
         <Table
           columns={columns}
           dataSource={data}
