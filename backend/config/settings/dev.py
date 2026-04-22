@@ -11,3 +11,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
     'rest_framework.renderers.BrowsableAPIRenderer',
 )
+
+# Se não quiser enviar de verdade em dev, descomente abaixo:
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

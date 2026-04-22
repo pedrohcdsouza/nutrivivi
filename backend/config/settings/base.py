@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     # Local apps
     'apps.health',
     'apps.anamneses',
+    'apps.notifications',
 ]
 
 MIDDLEWARE = [
@@ -104,6 +105,16 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email Configuration
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = env('SMTP_HOST', default='localhost')
+EMAIL_PORT = env.int('SMTP_PORT', default=25)
+EMAIL_HOST_USER = env('SMTP_USER', default='')
+EMAIL_HOST_PASSWORD = env('SMTP_PASS', default='')
+EMAIL_USE_TLS = env.bool('SMTP_USE_TLS', default=False)
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='Nutrivivi <noreply@nutrivivi.com.br>')
+NUTRITIONIST_EMAIL = env('NUTRITIONIST_EMAIL', default='nutricionista@nutrivivi.com.br')
 
 # REST Framework settings
 REST_FRAMEWORK = {

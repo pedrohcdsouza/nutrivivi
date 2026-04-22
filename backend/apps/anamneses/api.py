@@ -1,5 +1,7 @@
+from django.db import transaction
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
+from apps.notifications.services import send_anamnese_notification
 from .models import Anamnese
 from .serializers import (
     AnamneseCreateSerializer, 
@@ -15,6 +17,16 @@ class PublicAnamneseCreateAPIView(generics.CreateAPIView):
     queryset = Anamnese.objects.all()
     serializer_class = AnamneseCreateSerializer
     permission_classes = [AllowAny]
+
+    def perform_create(self, serializer):
+        """
+        Sobrescreve a criação para garantir o hook de email após persistência.
+        """
+        # Salva o objeto no banco na transação atual
+        anamnese = serializer.save()
+
+        # Dispara notificação de email apenas quando o banco efetivar o commit
+        transaction.on_commit(lambda: send_anamnese_notification(anamnese))
 
 
 class AdminAnamneseListAPIView(generics.ListAPIView):

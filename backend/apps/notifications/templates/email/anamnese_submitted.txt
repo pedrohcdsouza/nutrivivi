@@ -1,0 +1,12 @@
+Olá, Nutricionista!
+
+O paciente {{ anamnese.full_name }} enviou uma nova anamnese.
+
+- Data de Envio: {{ anamnese.created_at|date:"d/m/Y H:i" }}
+- Motivo da Consulta: {{ anamnese.consultation_reason }}
+
+Para visualizar todos os detalhes, acesse:
+{{ frontend_url }}/painel/anamneses/{{ anamnese.id }}
+
+---
+Este é um e-mail automático enviado pelo sistema Nutrivivi.
