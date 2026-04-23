@@ -1,4 +1,4 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+import { fetchWithAuth, API_URL } from "../auth";
 
 export async function getAnamneses(search?: string) {
   let url = `${API_URL}/admin/anamneses/`;
@@ -6,15 +6,14 @@ export async function getAnamneses(search?: string) {
     url += `?search=${encodeURIComponent(search)}`;
   }
 
-  const response = await fetch(url, {
+  const response = await fetchWithAuth(url, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    // cache: "no-store", // For now, we will use simple client-side fetch, but this is a good place to configure caching behavior in Next.js
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Não autorizado. Faça login novamente.");
+    }
     throw new Error("Erro ao buscar a lista de anamneses");
   }
 
@@ -22,14 +21,14 @@ export async function getAnamneses(search?: string) {
 }
 
 export async function getAnamneseById(id: string) {
-  const response = await fetch(`${API_URL}/admin/anamneses/${id}/`, {
+  const response = await fetchWithAuth(`${API_URL}/admin/anamneses/${id}/`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Não autorizado. Faça login novamente.");
+    }
     throw new Error("Erro ao buscar os detalhes da anamnese");
   }
 

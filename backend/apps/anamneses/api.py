@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from apps.notifications.services import send_anamnese_notification
 from .models import Anamnese
 from .serializers import (
@@ -12,8 +12,8 @@ from .serializers import (
 
 class PublicAnamneseCreateAPIView(generics.CreateAPIView):
     """
-    Endpoint público para submissão de uma nova anamnese pelo paciente.
-    Não requer autenticação.
+    Endpoint publico para submissao de uma nova anamnese pelo paciente.
+    Nao requer autenticacao.
     """
     queryset = Anamnese.objects.all()
     serializer_class = AnamneseCreateSerializer
@@ -21,25 +21,25 @@ class PublicAnamneseCreateAPIView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         """
-        Sobrescreve a criação para garantir o hook de email após persistência.
+        Sobrescreve a criacao para garantir o hook de email apos persistencia.
         """
-        # Salva o objeto no banco na transação atual
+        # Salva o objeto no banco na transacao atual
         anamnese = serializer.save()
 
-        # Dispara notificação de email apenas quando o banco efetivar o commit
+        # Dispara notificacao de email apenas quando o banco efetivar o commit
         transaction.on_commit(lambda: send_anamnese_notification(anamnese))
 
 
 class AdminAnamneseListAPIView(generics.ListAPIView):
     """
     Endpoint administrativo para listar todas as anamneses recebidas.
-    (Proteção de acesso via Nginx no MVP).
+    (Protegido via JWT)
     """
     queryset = Anamnese.objects.all()
     serializer_class = AnamneseListSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
-    # Configuração de Filtros e Busca
+    # Configuracao de Filtros e Busca
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['notification_status']
     search_fields = ['full_name']
@@ -50,8 +50,8 @@ class AdminAnamneseListAPIView(generics.ListAPIView):
 class AdminAnamneseDetailAPIView(generics.RetrieveAPIView):
     """
     Endpoint administrativo para buscar os detalhes completos de uma anamnese.
-    (Proteção de acesso via Nginx no MVP).
+    (Protegido via JWT)
     """
     queryset = Anamnese.objects.all()
     serializer_class = AnamneseDetailSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
