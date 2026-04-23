@@ -50,6 +50,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/auth:/etc/nginx/auth
     depends_on:
       - backend
       - frontend

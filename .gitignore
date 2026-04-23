@@ -40,6 +40,5 @@ share/python-wheels/
 .installed.cfg
 *.egg
 
-# OS
-.DS_Store
-Thumbs.db
+# Nginx Auth
+.htpasswd
