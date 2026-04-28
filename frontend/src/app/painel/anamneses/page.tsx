@@ -13,10 +13,6 @@ export default function PainelAnamneses() {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
 
-  useEffect(() => {
-    fetchData(searchText);
-  }, [searchText]);
-
   const fetchData = async (search: string = "") => {
     setLoading(true);
     try {
@@ -28,6 +24,10 @@ export default function PainelAnamneses() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData(searchText);
+  }, [searchText]);
 
   const columns = [
     {
@@ -72,7 +72,10 @@ export default function PainelAnamneses() {
           failed: { cls: "status-badge status-failed", label: "Falha" },
           pending: { cls: "status-badge status-pending", label: "Pendente" },
         };
-        const s = map[status] ?? { cls: "status-badge status-pending", label: status };
+        const s = map[status] ?? {
+          cls: "status-badge status-pending",
+          label: status,
+        };
         return <span className={s.cls}>{s.label}</span>;
       },
       width: 130,
@@ -115,7 +118,9 @@ export default function PainelAnamneses() {
         >
           <div>
             <h1 className="admin-page-title">Anamneses</h1>
-            <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--bark)" }}>
+            <p
+              style={{ margin: "4px 0 0", fontSize: 13, color: "var(--bark)" }}
+            >
               Gerencie os questionários recebidos
             </p>
           </div>
@@ -123,7 +128,9 @@ export default function PainelAnamneses() {
             placeholder="Buscar por nome do paciente..."
             allowClear
             onSearch={setSearchText}
-            onChange={(e) => { if (!e.target.value) setSearchText(""); }}
+            onChange={(e) => {
+              if (!e.target.value) setSearchText("");
+            }}
             style={{ width: 280 }}
             size="large"
           />

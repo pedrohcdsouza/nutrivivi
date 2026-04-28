@@ -16,7 +16,13 @@ function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="detail-card">
       <p className="detail-section-label">{title}</p>
@@ -30,10 +36,6 @@ export default function AnamneseDetalhe() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) fetchData(id as string);
-  }, [id]);
-
   const fetchData = async (anamnesesId: string) => {
     setLoading(true);
     try {
@@ -46,6 +48,10 @@ export default function AnamneseDetalhe() {
     }
   };
 
+  useEffect(() => {
+    if (id) fetchData(id as string);
+  }, [id]);
+
   const statusMap: Record<string, { cls: string; label: string }> = {
     sent: { cls: "status-badge status-sent", label: "Enviado" },
     failed: { cls: "status-badge status-failed", label: "Falha" },
@@ -55,7 +61,9 @@ export default function AnamneseDetalhe() {
   if (loading) {
     return (
       <AdminLayout>
-        <div style={{ display: "flex", justifyContent: "center", paddingTop: 80 }}>
+        <div
+          style={{ display: "flex", justifyContent: "center", paddingTop: 80 }}
+        >
           <Spin size="large" />
         </div>
       </AdminLayout>
@@ -110,10 +118,6 @@ export default function AnamneseDetalhe() {
       <SectionCard title="Informações Gerais">
         <div className="detail-grid">
           <InfoItem label="Nome Completo" value={data.full_name} />
-          <InfoItem
-            label="Data de Nascimento"
-            value={new Date(data.birth_date).toLocaleDateString("pt-BR")}
-          />
           <InfoItem label="Idade" value={`${data.age_years} anos`} />
           <InfoItem label="Profissão" value={data.profession} />
           <InfoItem
@@ -139,13 +143,24 @@ export default function AnamneseDetalhe() {
       {/* Saúde */}
       <SectionCard title="Saúde e Estilo de Vida">
         <div className="detail-grid">
-          <InfoItem label="Qualidade do Sono" value={`${data.sleep_quality} / 5`} />
-          <InfoItem label="Nível de Ansiedade" value={`${data.anxiety_level} / 5`} />
-          <InfoItem label="Nível de Estresse" value={`${data.stress_level} / 5`} />
+          <InfoItem
+            label="Qualidade do Sono"
+            value={`${data.sleep_quality} / 5`}
+          />
+          <InfoItem
+            label="Nível de Ansiedade"
+            value={`${data.anxiety_level} / 5`}
+          />
+          <InfoItem
+            label="Nível de Estresse"
+            value={`${data.stress_level} / 5`}
+          />
           <InfoItem
             label="Atividade Física"
             value={
-              <span className={`status-badge ${data.does_physical_activity ? "status-sent" : "status-pending"}`}>
+              <span
+                className={`status-badge ${data.does_physical_activity ? "status-sent" : "status-pending"}`}
+              >
                 {data.does_physical_activity ? "Sim" : "Não"}
               </span>
             }
@@ -153,8 +168,14 @@ export default function AnamneseDetalhe() {
           {data.does_physical_activity && (
             <>
               <InfoItem label="Modalidade" value={data.activity_modality} />
-              <InfoItem label="Frequência Semanal" value={`${data.activity_weekly_frequency}×/semana`} />
-              <InfoItem label="Duração" value={`${data.activity_duration_minutes} min`} />
+              <InfoItem
+                label="Frequência Semanal"
+                value={`${data.activity_weekly_frequency}×/semana`}
+              />
+              <InfoItem
+                label="Duração"
+                value={`${data.activity_duration_minutes} min`}
+              />
               <InfoItem label="Horário" value={data.activity_workout_time} />
             </>
           )}
@@ -167,7 +188,9 @@ export default function AnamneseDetalhe() {
           <InfoItem
             label="Usa Suplemento"
             value={
-              <span className={`status-badge ${data.uses_supplement ? "status-sent" : "status-pending"}`}>
+              <span
+                className={`status-badge ${data.uses_supplement ? "status-sent" : "status-pending"}`}
+              >
                 {data.uses_supplement ? "Sim" : "Não"}
               </span>
             }
