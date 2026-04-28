@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Form, Input, Button, message } from "antd";
+import { App, Form, Input, Button } from "antd";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/auth";
 import Link from "next/link";
@@ -9,12 +9,12 @@ import Link from "next/link";
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { message } = App.useApp();
 
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
       await login(values.username, values.password);
-      message.success("Login efetuado com sucesso!");
       router.push("/painel/anamneses");
     } catch (error: any) {
       message.error(error.message || "Usuário ou senha incorretos");

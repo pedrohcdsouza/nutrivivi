@@ -44,4 +44,4 @@ jobs:
           script: |
             [ -f /tmp/.nutrivivi_env_backup ] && mv /tmp/.nutrivivi_env_backup ~/nutrivivi/.env
             cd ~/nutrivivi
-            docker compose -f infra/prod/docker-compose.yml up -d --build
+            docker compose --project-directory ~/nutrivivi -f infra/prod/docker-compose.yml up -d --build

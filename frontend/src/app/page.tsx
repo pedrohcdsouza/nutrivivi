@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import {
+  App,
   Form,
   Input,
   InputNumber,
   Select,
   Switch,
   Button,
-  message,
 } from "antd";
 import { submitAnamnese } from "@/lib/api/anamneses";
 import Link from "next/link";
@@ -102,6 +102,7 @@ function SectionCard({
 }
 
 export default function HomePage() {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);

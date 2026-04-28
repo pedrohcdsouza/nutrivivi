@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, Input, Button, message } from "antd";
+import { App, Table, Input, Button } from "antd";
 import Link from "next/link";
 import { getAnamneses } from "@/lib/api/admin";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -9,15 +9,23 @@ import AdminLayout from "@/components/layout/AdminLayout";
 const { Search } = Input;
 
 export default function PainelAnamneses() {
+  const { message } = App.useApp();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const [total, setTotal] = useState<number | null>(null);
 
   const fetchData = async (search: string = "") => {
     setLoading(true);
     try {
       const response = await getAnamneses(search);
-      setData(response.results || response);
+      if (response.results) {
+        setData(response.results);
+        setTotal(response.count ?? response.results.length);
+      } else {
+        setData(response);
+        setTotal(response.length);
+      }
     } catch (error: any) {
       message.error(error.message);
     } finally {
@@ -118,10 +126,10 @@ export default function PainelAnamneses() {
         >
           <div>
             <h1 className="admin-page-title">Anamneses</h1>
-            <p
-              style={{ margin: "4px 0 0", fontSize: 13, color: "var(--bark)" }}
-            >
-              Gerencie os questionários recebidos
+            <p className="admin-page-subtitle">
+              {total !== null
+                ? `${total} ${total === 1 ? "registro" : "registros"} encontrados`
+                : "Gerencie os questionários recebidos"}
             </p>
           </div>
           <Search

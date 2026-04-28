@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Spin, Button, message } from "antd";
+import { App, Spin, Button } from "antd";
 import Link from "next/link";
 import { getAnamneseById } from "@/lib/api/admin";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -16,22 +16,44 @@ function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function ScoreBar({ label, value, max = 5 }: { label: string; value: number; max?: number }) {
+  return (
+    <div className="detail-item score-bar-wrap">
+      <div className="score-bar-header">
+        <span className="score-bar-label">{label}</span>
+        <span className="score-bar-value">{value}/{max}</span>
+      </div>
+      <div className="score-track">
+        <div className="score-fill" style={{ width: `${(value / max) * 100}%` }} />
+      </div>
+    </div>
+  );
+}
+
 function SectionCard({
+  number,
   title,
   children,
 }: {
+  number: number;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="detail-card">
-      <p className="detail-section-label">{title}</p>
+      <div className="detail-card-header">
+        <span className="detail-card-number">
+          {String(number).padStart(2, "0")}
+        </span>
+        <p className="detail-section-label">{title}</p>
+      </div>
       {children}
     </div>
   );
 }
 
 export default function AnamneseDetalhe() {
+  const { message } = App.useApp();
   const { id } = useParams();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -89,7 +111,8 @@ export default function AnamneseDetalhe() {
       <div className="detail-header">
         <div>
           <p className="detail-patient-name">{data.full_name}</p>
-          <p className="detail-meta">
+          <div className="detail-name-accent" />
+          <p className="detail-meta" style={{ marginTop: 10 }}>
             Enviado em{" "}
             {new Date(data.created_at).toLocaleString("pt-BR", {
               day: "2-digit",
@@ -114,8 +137,8 @@ export default function AnamneseDetalhe() {
         </Link>
       </div>
 
-      {/* Informações Gerais */}
-      <SectionCard title="Informações Gerais">
+      {/* 01 Informações Gerais */}
+      <SectionCard number={1} title="Informações Gerais">
         <div className="detail-grid">
           <InfoItem label="Nome Completo" value={data.full_name} />
           <InfoItem label="Idade" value={`${data.age_years} anos`} />
@@ -131,8 +154,8 @@ export default function AnamneseDetalhe() {
         </div>
       </SectionCard>
 
-      {/* Antropometria */}
-      <SectionCard title="Antropometria Inicial">
+      {/* 02 Antropometria */}
+      <SectionCard number={2} title="Antropometria Inicial">
         <div className="detail-grid">
           <InfoItem label="Peso Atual" value={`${data.weight_kg} kg`} />
           <InfoItem label="Altura" value={`${data.height_cm} cm`} />
@@ -140,21 +163,12 @@ export default function AnamneseDetalhe() {
         </div>
       </SectionCard>
 
-      {/* Saúde */}
-      <SectionCard title="Saúde e Estilo de Vida">
+      {/* 03 Saúde e Estilo de Vida */}
+      <SectionCard number={3} title="Saúde e Estilo de Vida">
         <div className="detail-grid">
-          <InfoItem
-            label="Qualidade do Sono"
-            value={`${data.sleep_quality} / 5`}
-          />
-          <InfoItem
-            label="Nível de Ansiedade"
-            value={`${data.anxiety_level} / 5`}
-          />
-          <InfoItem
-            label="Nível de Estresse"
-            value={`${data.stress_level} / 5`}
-          />
+          <ScoreBar label="Qualidade do Sono" value={data.sleep_quality} />
+          <ScoreBar label="Nível de Ansiedade" value={data.anxiety_level} />
+          <ScoreBar label="Nível de Estresse" value={data.stress_level} />
           <InfoItem
             label="Atividade Física"
             value={
@@ -182,8 +196,8 @@ export default function AnamneseDetalhe() {
         </div>
       </SectionCard>
 
-      {/* Suplementação */}
-      <SectionCard title="Suplementação Atual">
+      {/* 04 Suplementação */}
+      <SectionCard number={4} title="Suplementação Atual">
         <div className="detail-grid">
           <InfoItem
             label="Usa Suplemento"
@@ -204,8 +218,8 @@ export default function AnamneseDetalhe() {
         </div>
       </SectionCard>
 
-      {/* Recordatório */}
-      <SectionCard title="Recordatório Alimentar">
+      {/* 05 Recordatório */}
+      <SectionCard number={5} title="Recordatório Alimentar">
         <div className="detail-food-grid">
           {[
             { meal: "Café da Manhã", key: "recall_breakfast" },
@@ -222,9 +236,9 @@ export default function AnamneseDetalhe() {
         </div>
       </SectionCard>
 
-      {/* Observações */}
+      {/* 06 Observações */}
       {data.additional_observations && (
-        <SectionCard title="Observações Adicionais">
+        <SectionCard number={6} title="Observações Adicionais">
           <div className="detail-obs-block">{data.additional_observations}</div>
         </SectionCard>
       )}
