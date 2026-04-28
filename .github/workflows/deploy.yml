@@ -36,12 +36,23 @@ jobs:
 
       - name: Restore .env and deploy
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
+          envs: ENV_FILE
           script: |
-            [ -f /tmp/.nutrivivi_env_backup ] && mv /tmp/.nutrivivi_env_backup ~/nutrivivi/.env
+            if [ -f /tmp/.nutrivivi_env_backup ]; then
+              mv /tmp/.nutrivivi_env_backup ~/nutrivivi/.env
+            elif [ -n "$ENV_FILE" ]; then
+              printf '%s\n' "$ENV_FILE" > ~/nutrivivi/.env
+            fi
+            if [ ! -f ~/nutrivivi/.env ]; then
+              echo "ERROR: .env is missing — add an ENV_FILE secret to the repository"
+              exit 1
+            fi
             cd ~/nutrivivi
-            docker compose --project-directory ~/nutrivivi -f infra/prod/docker-compose.yml up -d --build
+            docker compose --env-file ~/nutrivivi/.env -f infra/prod/docker-compose.yml up -d --build
