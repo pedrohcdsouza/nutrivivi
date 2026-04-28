@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
 import ptBR from "antd/locale/pt_BR";
-import MainLayout from "@/components/layout/MainLayout";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Nutrivivi - Atendimento Nutricional",
-  description: "Plataforma de anamnese para sua nutricionista",
+  title: "Nutrivivi – Nutrição Personalizada",
+  description: "Plataforma de anamnese nutricional",
 };
 
 export default function RootLayout({
@@ -20,27 +16,42 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
+      <body>
         <AntdRegistry>
           <ConfigProvider
             locale={ptBR}
             theme={{
               token: {
-                colorPrimary: "#52c41a", // Verde claro predominante
-                colorInfo: "#52c41a",
-                borderRadius: 6,
-                fontFamily: inter.style.fontFamily,
+                colorPrimary: "#3a7d5a",
+                colorLink: "#3a7d5a",
+                colorSuccess: "#52a678",
+                borderRadius: 8,
+                fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif",
+                colorBgContainer: "#ffffff",
+                colorBorder: "#a8d5ba",
+                colorText: "#1a2319",
+                colorTextSecondary: "#4a6357",
+                colorBorderSecondary: "#d1ead9",
               },
               components: {
-                Layout: {
-                  headerBg: "#fff",
-                  headerColor: "#333",
-                  footerBg: "#f0f2f5",
+                Button: {
+                  borderRadius: 8,
+                  controlHeight: 44,
+                  paddingContentHorizontal: 28,
+                },
+                Input: { borderRadius: 8 },
+                Select: { borderRadius: 8 },
+                DatePicker: { borderRadius: 8 },
+                InputNumber: { borderRadius: 8 },
+                Table: {
+                  headerBg: "#f0ece3",
+                  headerColor: "#1b3a2d",
+                  rowHoverBg: "#f5faf7",
                 },
               },
             }}
           >
-            <MainLayout>{children}</MainLayout>
+            {children}
           </ConfigProvider>
         </AntdRegistry>
       </body>

@@ -1,65 +1,77 @@
 "use client";
 
 import { useState } from "react";
-import { Form, Input, Button, Card, Typography, message, Layout } from "antd";
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { Form, Input, Button, message } from "antd";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/auth";
-
-const { Title, Text } = Typography;
-const { Content } = Layout;
+import Link from "next/link";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFinish = async (values: any) => {
     setLoading(true);
     try {
       await login(values.username, values.password);
       message.success("Login efetuado com sucesso!");
       router.push("/painel/anamneses");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      message.error(error.message || "Erro ao fazer login");
+      message.error(error.message || "Usuário ou senha incorretos");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Layout style={{ minHeight: "100vh", justifyContent: "center", alignItems: "center", backgroundColor: "#f0f2f5" }}>
-      <Content style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%" }}>
-        <Card style={{ width: 400, boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }}>
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <Title level={3} style={{ margin: 0 }}>Nutrivivi</Title>
-            <Text type="secondary">Painel Administrativo</Text>
+    <div className="login-root">
+      <div className="login-card">
+        <div className="login-brand">
+          <div className="login-logo">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <path
+                d="M16 30 C8 24 4 16 6 8 C8 2 16 0 22 4 C28 8 30 18 24 24 C21 27 18 29 16 30Z"
+                fill="#a8d5ba"
+              />
+              <path
+                d="M16 30 C14 22 12 14 14 8"
+                stroke="#2d5a3d"
+                strokeWidth="1.5"
+              />
+            </svg>
+            <span className="login-logo-name">Nutrivivi</span>
           </div>
+          <p className="login-subtitle-text">Painel Administrativo</p>
+        </div>
 
-          <Form name="login" onFinish={onFinish} layout="vertical" size="large">
-            <Form.Item
-              name="username"
-              rules={[{ required: true, message: "Por favor, insira seu usuário/e-mail!" }]}
-            >
-              <Input prefix={<UserOutlined />} placeholder="Usuário ou E-mail" />
-            </Form.Item>
+        <Form name="login" onFinish={onFinish} layout="vertical" size="large">
+          <Form.Item
+            name="username"
+            label="Usuário"
+            rules={[{ required: true, message: "Por favor, insira seu usuário" }]}
+          >
+            <Input placeholder="Usuário ou e-mail" />
+          </Form.Item>
 
-            <Form.Item
-              name="password"
-              rules={[{ required: true, message: "Por favor, insira sua senha!" }]}
-            >
-              <Input.Password prefix={<LockOutlined />} placeholder="Senha" />
-            </Form.Item>
+          <Form.Item
+            name="password"
+            label="Senha"
+            rules={[{ required: true, message: "Por favor, insira sua senha" }]}
+          >
+            <Input.Password placeholder="Sua senha" />
+          </Form.Item>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading} block>
-                Entrar
-              </Button>
-            </Form.Item>
-          </Form>
-        </Card>
-      </Content>
-    </Layout>
+          <Form.Item style={{ marginTop: 8, marginBottom: 0 }}>
+            <Button type="primary" htmlType="submit" loading={loading} block>
+              Entrar
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <Link href="/" className="login-back">
+          ← Voltar para o formulário
+        </Link>
+      </div>
+    </div>
   );
 }

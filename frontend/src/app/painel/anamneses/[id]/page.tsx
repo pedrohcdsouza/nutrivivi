@@ -2,12 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Card, Descriptions, Spin, Tag, Typography, Button, Space, Divider, message } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { Spin, Button, message } from "antd";
 import Link from "next/link";
 import { getAnamneseById } from "@/lib/api/admin";
+import AdminLayout from "@/components/layout/AdminLayout";
 
-const { Title, Text } = Typography;
+function InfoItem({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="detail-item">
+      <p className="detail-item-label">{label}</p>
+      <p className="detail-item-value">{value}</p>
+    </div>
+  );
+}
+
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="detail-card">
+      <p className="detail-section-label">{title}</p>
+      {children}
+    </div>
+  );
+}
 
 export default function AnamneseDetalhe() {
   const { id } = useParams();
@@ -15,15 +31,13 @@ export default function AnamneseDetalhe() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      fetchData(id as string);
-    }
+    if (id) fetchData(id as string);
   }, [id]);
 
-  const fetchData = async (id: string) => {
+  const fetchData = async (anamnesesId: string) => {
     setLoading(true);
     try {
-      const result = await getAnamneseById(id);
+      const result = await getAnamneseById(anamnesesId);
       setData(result);
     } catch (error: any) {
       message.error(error.message);
@@ -32,105 +46,165 @@ export default function AnamneseDetalhe() {
     }
   };
 
+  const statusMap: Record<string, { cls: string; label: string }> = {
+    sent: { cls: "status-badge status-sent", label: "Enviado" },
+    failed: { cls: "status-badge status-failed", label: "Falha" },
+    pending: { cls: "status-badge status-pending", label: "Pendente" },
+  };
+
   if (loading) {
     return (
-      <div style={{ textAlign: "center", padding: 50 }}>
-        <Spin size="large" />
-      </div>
+      <AdminLayout>
+        <div style={{ display: "flex", justifyContent: "center", paddingTop: 80 }}>
+          <Spin size="large" />
+        </div>
+      </AdminLayout>
     );
   }
 
   if (!data) {
-    return <Card>Anamnese não encontrada.</Card>;
+    return (
+      <AdminLayout>
+        <p style={{ color: "var(--bark)" }}>Anamnese não encontrada.</p>
+      </AdminLayout>
+    );
   }
 
+  const notifStatus = statusMap[data.notification_status] ?? {
+    cls: "status-badge status-pending",
+    label: data.notification_status,
+  };
+
   return (
-    <Space direction="vertical" style={{ width: "100%" }} size="large">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Title level={2} style={{ margin: 0 }}>Detalhes da Anamnese</Title>
+    <AdminLayout>
+      {/* Header */}
+      <div className="detail-header">
+        <div>
+          <p className="detail-patient-name">{data.full_name}</p>
+          <p className="detail-meta">
+            Enviado em{" "}
+            {new Date(data.created_at).toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
         <Link href="/painel/anamneses">
-          <Button icon={<ArrowLeftOutlined />}>Voltar para Lista</Button>
+          <Button
+            style={{
+              borderColor: "var(--mint)",
+              color: "var(--bark)",
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          >
+            ← Voltar
+          </Button>
         </Link>
       </div>
 
-      <Card bordered={false}>
-        <Descriptions title="Informações Gerais" bordered column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }}>
-          <Descriptions.Item label="Nome Completo">{data.full_name}</Descriptions.Item>
-          <Descriptions.Item label="Data de Nascimento">{new Date(data.birth_date).toLocaleDateString('pt-BR')}</Descriptions.Item>
-          <Descriptions.Item label="Idade">{data.age_years} anos</Descriptions.Item>
-          <Descriptions.Item label="Profissão">{data.profession}</Descriptions.Item>
-          <Descriptions.Item label="Motivo da Consulta" span={2}>{data.consultation_reason}</Descriptions.Item>
-          <Descriptions.Item label="Data de Envio do Formulário">{new Date(data.created_at).toLocaleString('pt-BR')}</Descriptions.Item>
-          <Descriptions.Item label="Status da Notificação (Email)">
-            <Tag color={data.notification_status === 'sent' ? 'green' : data.notification_status === 'failed' ? 'red' : 'orange'}>
-              {data.notification_status}
-            </Tag>
-          </Descriptions.Item>
-        </Descriptions>
+      {/* Informações Gerais */}
+      <SectionCard title="Informações Gerais">
+        <div className="detail-grid">
+          <InfoItem label="Nome Completo" value={data.full_name} />
+          <InfoItem
+            label="Data de Nascimento"
+            value={new Date(data.birth_date).toLocaleDateString("pt-BR")}
+          />
+          <InfoItem label="Idade" value={`${data.age_years} anos`} />
+          <InfoItem label="Profissão" value={data.profession} />
+          <InfoItem
+            label="Notificação"
+            value={<span className={notifStatus.cls}>{notifStatus.label}</span>}
+          />
+          <div className="detail-item detail-grid-wide">
+            <p className="detail-item-label">Motivo da Consulta</p>
+            <p className="detail-item-value">{data.consultation_reason}</p>
+          </div>
+        </div>
+      </SectionCard>
 
-        <Divider />
+      {/* Antropometria */}
+      <SectionCard title="Antropometria Inicial">
+        <div className="detail-grid">
+          <InfoItem label="Peso Atual" value={`${data.weight_kg} kg`} />
+          <InfoItem label="Altura" value={`${data.height_cm} cm`} />
+          <InfoItem label="IMC" value={data.bmi} />
+        </div>
+      </SectionCard>
 
-        <Descriptions title="Antropometria Inicial" bordered column={{ xxl: 3, xl: 3, lg: 3, md: 1, sm: 1, xs: 1 }}>
-          <Descriptions.Item label="Peso Atual">{data.weight_kg} kg</Descriptions.Item>
-          <Descriptions.Item label="Altura">{data.height_cm} cm</Descriptions.Item>
-          <Descriptions.Item label="IMC">{data.bmi}</Descriptions.Item>
-        </Descriptions>
-
-        <Divider />
-
-        <Descriptions title="Perfil de Saúde e Estilo de Vida" bordered column={{ xxl: 3, xl: 3, lg: 3, md: 1, sm: 1, xs: 1 }}>
-          <Descriptions.Item label="Qualidade do Sono">{data.sleep_quality}/5</Descriptions.Item>
-          <Descriptions.Item label="Nível de Ansiedade">{data.anxiety_level}/5</Descriptions.Item>
-          <Descriptions.Item label="Nível de Estresse">{data.stress_level}/5</Descriptions.Item>
-          <Descriptions.Item label="Pratica Atividade Física?" span={3}>
-            <Tag color={data.does_physical_activity ? 'blue' : 'default'}>
-              {data.does_physical_activity ? 'Sim' : 'Não'}
-            </Tag>
-          </Descriptions.Item>
+      {/* Saúde */}
+      <SectionCard title="Saúde e Estilo de Vida">
+        <div className="detail-grid">
+          <InfoItem label="Qualidade do Sono" value={`${data.sleep_quality} / 5`} />
+          <InfoItem label="Nível de Ansiedade" value={`${data.anxiety_level} / 5`} />
+          <InfoItem label="Nível de Estresse" value={`${data.stress_level} / 5`} />
+          <InfoItem
+            label="Atividade Física"
+            value={
+              <span className={`status-badge ${data.does_physical_activity ? "status-sent" : "status-pending"}`}>
+                {data.does_physical_activity ? "Sim" : "Não"}
+              </span>
+            }
+          />
           {data.does_physical_activity && (
             <>
-              <Descriptions.Item label="Modalidade">{data.activity_modality}</Descriptions.Item>
-              <Descriptions.Item label="Frequência Semanal">{data.activity_weekly_frequency}x</Descriptions.Item>
-              <Descriptions.Item label="Duração">{data.activity_duration_minutes} min</Descriptions.Item>
-              <Descriptions.Item label="Horário">{data.activity_workout_time}</Descriptions.Item>
+              <InfoItem label="Modalidade" value={data.activity_modality} />
+              <InfoItem label="Frequência Semanal" value={`${data.activity_weekly_frequency}×/semana`} />
+              <InfoItem label="Duração" value={`${data.activity_duration_minutes} min`} />
+              <InfoItem label="Horário" value={data.activity_workout_time} />
             </>
           )}
-        </Descriptions>
+        </div>
+      </SectionCard>
 
-        <Divider />
-
-        <Descriptions title="Suplementação Atual" bordered column={1}>
-          <Descriptions.Item label="Usa Suplemento?">
-            <Tag color={data.uses_supplement ? 'blue' : 'default'}>
-              {data.uses_supplement ? 'Sim' : 'Não'}
-            </Tag>
-          </Descriptions.Item>
+      {/* Suplementação */}
+      <SectionCard title="Suplementação Atual">
+        <div className="detail-grid">
+          <InfoItem
+            label="Usa Suplemento"
+            value={
+              <span className={`status-badge ${data.uses_supplement ? "status-sent" : "status-pending"}`}>
+                {data.uses_supplement ? "Sim" : "Não"}
+              </span>
+            }
+          />
           {data.uses_supplement && (
-            <Descriptions.Item label="Quais suplementos">{data.supplements}</Descriptions.Item>
+            <div className="detail-item detail-grid-wide">
+              <p className="detail-item-label">Suplementos</p>
+              <p className="detail-item-value">{data.supplements}</p>
+            </div>
           )}
-        </Descriptions>
+        </div>
+      </SectionCard>
 
-        <Divider />
+      {/* Recordatório */}
+      <SectionCard title="Recordatório Alimentar">
+        <div className="detail-food-grid">
+          {[
+            { meal: "Café da Manhã", key: "recall_breakfast" },
+            { meal: "Almoço", key: "recall_lunch" },
+            { meal: "Lanche", key: "recall_snack" },
+            { meal: "Jantar", key: "recall_dinner" },
+            { meal: "Ceia / Outros", key: "recall_supper_other" },
+          ].map(({ meal, key }) => (
+            <div key={key} className="detail-food-item">
+              <p className="detail-food-meal">{meal}</p>
+              <p className="detail-food-text">{data[key]}</p>
+            </div>
+          ))}
+        </div>
+      </SectionCard>
 
-        <Descriptions title="Recordatório Alimentar" bordered column={1}>
-          <Descriptions.Item label="Café da Manhã"><Text style={{ whiteSpace: "pre-wrap" }}>{data.recall_breakfast}</Text></Descriptions.Item>
-          <Descriptions.Item label="Almoço"><Text style={{ whiteSpace: "pre-wrap" }}>{data.recall_lunch}</Text></Descriptions.Item>
-          <Descriptions.Item label="Lanche"><Text style={{ whiteSpace: "pre-wrap" }}>{data.recall_snack}</Text></Descriptions.Item>
-          <Descriptions.Item label="Jantar"><Text style={{ whiteSpace: "pre-wrap" }}>{data.recall_dinner}</Text></Descriptions.Item>
-          <Descriptions.Item label="Ceia/Outros"><Text style={{ whiteSpace: "pre-wrap" }}>{data.recall_supper_other}</Text></Descriptions.Item>
-        </Descriptions>
-
-        {data.additional_observations && (
-          <>
-            <Divider />
-            <Descriptions title="Observações Adicionais" bordered column={1}>
-              <Descriptions.Item label="Observações">
-                <Text style={{ whiteSpace: "pre-wrap" }}>{data.additional_observations}</Text>
-              </Descriptions.Item>
-            </Descriptions>
-          </>
-        )}
-      </Card>
-    </Space>
+      {/* Observações */}
+      {data.additional_observations && (
+        <SectionCard title="Observações Adicionais">
+          <div className="detail-obs-block">{data.additional_observations}</div>
+        </SectionCard>
+      )}
+    </AdminLayout>
   );
 }
