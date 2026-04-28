@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   App,
   Form,
@@ -106,6 +106,18 @@ export default function HomePage() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const onFinish = async (values: any) => {
     setLoading(true);
@@ -170,6 +182,38 @@ export default function HomePage() {
           <Link href="/login" className="admin-link">
             Área da nutricionista →
           </Link>
+
+          {/* Kebab menu — visível apenas no mobile */}
+          <div className="mobile-menu-wrap" ref={menuRef}>
+            <button
+              className="kebab-btn"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label="Abrir menu"
+              aria-expanded={menuOpen}
+            >
+              <span className="kebab-dot" />
+              <span className="kebab-dot" />
+              <span className="kebab-dot" />
+            </button>
+            {menuOpen && (
+              <div className="mobile-admin-menu" role="menu">
+                <Link
+                  href="/login"
+                  className="mobile-menu-item"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Entrar como nutricionista
+                </Link>
+                <Link
+                  href="/painel/anamneses"
+                  className="mobile-menu-item"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Painel administrativo
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </aside>
 

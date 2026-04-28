@@ -156,6 +156,7 @@ export default function PainelAnamneses() {
             showSizeChanger: false,
             style: { padding: "12px 24px" },
           }}
+          scroll={{ x: 800 }}
           style={{ fontFamily: "var(--font-body)" }}
         />
       </div>

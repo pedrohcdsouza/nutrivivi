@@ -849,6 +849,68 @@ body {
   white-space: pre-wrap;
 }
 
+/* ─── Mobile kebab menu ─────────────────────────────────────── */
+.mobile-menu-wrap {
+  display: none;
+  position: relative;
+  margin-left: auto;
+}
+
+.kebab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 10px 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.kebab-btn:hover { background: rgba(168, 213, 186, 0.15); }
+
+.kebab-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(168, 213, 186, 0.85);
+}
+
+.mobile-admin-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--foam);
+  min-width: 220px;
+  z-index: 200;
+  animation: fadeInUp 0.18s ease both;
+}
+
+.mobile-menu-item {
+  display: block;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--charcoal);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.mobile-menu-item:hover {
+  background: var(--foam);
+  color: var(--fern);
+}
+
 /* ─── Responsive ────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .page-root { flex-direction: column; }
@@ -874,6 +936,7 @@ body {
   .brand-tagline { font-size: 28px; }
   .brand-desc { display: none; }
   .admin-link { display: none; }
+  .mobile-menu-wrap { display: block; }
   .right-panel { padding: 32px 24px; }
   .form-main-title { font-size: 30px; }
   .admin-sidebar {
@@ -907,5 +970,6 @@ body {
   .section-card { padding: 24px 18px; }
   .right-panel { padding: 24px 16px; }
   .detail-card { padding: 20px 16px; }
-  .detail-grid { grid-template-columns: 1fr 1fr; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .detail-food-grid { grid-template-columns: 1fr; }
 }
