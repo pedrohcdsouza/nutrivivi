@@ -23,7 +23,7 @@ openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
   -subj "/CN=localhost" 2>/dev/null
 
 echo "### Subindo nginx com cert dummy..."
-docker compose --env-file ../../.env up -d nginx
+docker compose --env-file .env up -d nginx
 
 echo "### Aguardando nginx..."
 sleep 3
@@ -32,7 +32,7 @@ echo "### Removendo cert dummy..."
 rm -rf "$CONF_DIR/live"
 
 echo "### Solicitando certificado real ao Let's Encrypt..."
-docker compose --env-file ../../.env run --rm certbot certonly \
+docker compose --env-file .env run --rm certbot certonly \
   --webroot \
   --webroot-path=/var/www/certbot \
   --email "$EMAIL" \
@@ -43,6 +43,6 @@ docker compose --env-file ../../.env run --rm certbot certonly \
   -d api.nutrivivi.com.br
 
 echo "### Recarregando nginx com certificado real..."
-docker exec prod-nginx-1 nginx -s reload
+docker compose exec nginx nginx -s reload
 
 echo "### Pronto! HTTPS ativo para: ${DOMAINS[*]}"
