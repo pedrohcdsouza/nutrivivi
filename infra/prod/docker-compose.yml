@@ -1,9 +1,9 @@
-version: "3.8"
-
 services:
   db:
     image: postgres:15-alpine
     restart: always
+    ports:
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -30,10 +30,11 @@ services:
       - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
       - NUTRITIONIST_EMAIL=${NUTRITIONIST_EMAIL}
       - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - RESEND_API_KEY=${RESEND_API_KEY}
     depends_on:
       - db
     command: >
-      sh -c "python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+      sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"
 
   frontend:
     build:
@@ -50,12 +51,21 @@ services:
     restart: always
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/auth:/etc/nginx/auth
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
     depends_on:
       - backend
       - frontend
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
 
 volumes:
   postgres_data:

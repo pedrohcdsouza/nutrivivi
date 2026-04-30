@@ -42,3 +42,5 @@ share/python-wheels/
 
 # Nginx Auth
 .htpasswd
+
+certbot
