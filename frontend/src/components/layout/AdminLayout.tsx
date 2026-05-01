@@ -5,321 +5,12 @@ import { logout } from "@/lib/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const css = `
-.admin-root { display: flex; min-height: 100vh; }
-
-.admin-sidebar {
-  width: 220px;
-  flex-shrink: 0;
-  background: linear-gradient(158deg, var(--forest) 0%, var(--evergreen) 55%, #243e2e 100%);
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.admin-sidebar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a8d5ba' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
-.admin-sidebar-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 32px 22px;
-}
-.admin-sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  margin-bottom: 6px;
-}
-.admin-sidebar-name {
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.95);
-  line-height: 1.2;
-}
-.admin-sidebar-badge {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(168,213,186,0.65);
-}
-.admin-sidebar-botanical-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.admin-sidebar-botanical {
-  width: 140px;
-  height: auto;
-  opacity: 0.82;
-  animation: leafDrift 9s ease-in-out infinite;
-}
-.admin-nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 8px;
-}
-.admin-nav-section-label {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(168,213,186,0.38);
-  margin: 0 0 8px;
-  padding: 0 8px;
-}
-.admin-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 9px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(168,213,186,0.7);
-  text-decoration: none;
-  letter-spacing: 0.01em;
-  transition: all 0.2s;
-}
-.admin-nav-link:hover { background: rgba(168,213,186,0.1); color: rgba(255,255,255,0.88); }
-.admin-nav-link.active { background: rgba(168,213,186,0.16); color: white; }
-
-.admin-sidebar-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(168,213,186,0.12);
-}
-.admin-sidebar-ext-link {
-  font-size: 11px;
-  color: rgba(168,213,186,0.45);
-  text-decoration: none;
-  letter-spacing: 0.04em;
-  transition: color 0.2s;
-  padding: 4px 0;
-}
-.admin-sidebar-ext-link:hover { color: var(--mint); }
-.admin-sidebar-logout {
-  background: none;
-  border: 1px solid rgba(168,213,186,0.2);
-  color: rgba(168,213,186,0.55);
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: center;
-}
-.admin-sidebar-logout:hover { border-color: rgba(168,213,186,0.4); color: var(--mint); }
-
-.admin-main { flex: 1; min-height: 100vh; background: var(--paper); overflow-x: hidden; }
-.admin-content { padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
-
-.admin-page-header { margin-bottom: 32px; }
-.admin-page-title {
-  font-family: var(--font-display) !important;
-  font-size: 38px !important;
-  font-weight: 400 !important;
-  color: var(--forest) !important;
-  letter-spacing: -0.015em !important;
-  margin: 0 !important;
-  line-height: 1.1 !important;
-}
-.admin-page-subtitle { font-size: 13px; color: var(--bark); margin: 6px 0 0; }
-
-.admin-table-wrap {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid var(--foam);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-.patient-name { font-weight: 600; color: var(--forest); font-size: 14px; }
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.status-sent { background: #e8f5ee; color: #2d6a4f; }
-.status-failed { background: #fde8e8; color: #9b3a3a; }
-.status-pending { background: #fef3e2; color: #92610a; }
-
-.detail-header {
-  margin-bottom: 32px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.detail-patient-name {
-  font-family: var(--font-display);
-  font-size: 38px;
-  font-weight: 400;
-  color: var(--forest);
-  margin: 0 0 4px;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-.detail-meta { font-size: 13px; color: var(--bark); }
-
-.detail-card {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid var(--foam);
-  padding: 28px 32px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow-sm);
-}
-.detail-card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--foam);
-}
-.detail-card-number {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--sage);
-  letter-spacing: 0.08em;
-  background: var(--foam);
-  padding: 4px 10px;
-  border-radius: 20px;
-  min-width: 44px;
-  text-align: center;
-  flex-shrink: 0;
-}
-.detail-section-label {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--forest);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-.detail-name-accent {
-  width: 56px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--fern), var(--mint));
-  border-radius: 2px;
-  margin: 8px 0 0;
-}
-
-.score-bar-wrap { display: flex; flex-direction: column; gap: 6px; }
-.score-bar-header { display: flex; align-items: center; justify-content: space-between; }
-.score-bar-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mist);
-}
-.score-bar-value { font-size: 13px; font-weight: 600; color: var(--charcoal); }
-.score-track { height: 4px; background: var(--foam); border-radius: 2px; overflow: hidden; }
-.score-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--sage), var(--fern));
-  border-radius: 2px;
-  transition: width 0.6s ease;
-}
-
-.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-.detail-grid-wide { grid-column: 1 / -1; }
-.detail-item-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mist);
-  margin-bottom: 4px;
-}
-.detail-item-value { font-size: 15px; color: var(--charcoal); font-weight: 500; line-height: 1.5; }
-
-.detail-food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-.detail-food-item { background: var(--foam); border-radius: 12px; padding: 16px; }
-.detail-food-meal {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--sage);
-  margin-bottom: 6px;
-}
-.detail-food-text { font-size: 14px; color: var(--charcoal); line-height: 1.55; white-space: pre-wrap; }
-
-.detail-obs-block {
-  background: var(--foam);
-  border-radius: 12px;
-  padding: 20px;
-  font-size: 14px;
-  color: var(--charcoal);
-  line-height: 1.7;
-  white-space: pre-wrap;
-}
-
-@media (max-width: 900px) {
-  .admin-sidebar {
-    width: 100%;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    flex-direction: row;
-  }
-  .admin-sidebar-content { flex-direction: row; align-items: center; padding: 0 20px; height: 56px; }
-  .admin-sidebar-botanical-wrap { display: none; }
-  .admin-nav-section-label { display: none; }
-  .admin-sidebar-badge { display: none; }
-  .admin-nav-links { flex-direction: row; gap: 4px; margin-bottom: 0; flex: 1; padding: 0 12px; }
-  .admin-sidebar-footer { flex-direction: row; padding: 0; border: none; align-items: center; gap: 8px; }
-  .admin-sidebar-ext-link { display: none; }
-  .admin-sidebar-logout { padding: 5px 12px; }
-  .admin-root { flex-direction: column; }
-  .admin-main { min-height: calc(100vh - 56px); }
-  .admin-content { padding: 24px 20px; }
-}
-@media (max-width: 600px) {
-  .detail-card { padding: 20px 16px; }
-  .detail-grid { grid-template-columns: 1fr; }
-  .detail-food-grid { grid-template-columns: 1fr; }
-}
-`;
-
 function SidebarBotanical() {
   return (
     <svg
       viewBox="0 0 200 300"
       fill="none"
-      className="admin-sidebar-botanical"
+      className="w-[140px] h-auto opacity-[0.82] animate-leafDrift"
       aria-hidden="true"
     >
       <path d="M100 290 C100 290 98 218 102 148 C106 88 100 50 100 32" stroke="rgba(168,213,186,0.28)" strokeWidth="1.5" />
@@ -340,60 +31,101 @@ function SidebarBotanical() {
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isActive =
+    pathname === "/painel/anamneses" || pathname?.startsWith("/painel/anamneses/");
 
   return (
-    <>
-      <style>{css}</style>
-      <div className="admin-root">
-        <aside className="admin-sidebar">
-          <div className="admin-sidebar-content">
-            <Link href="/painel/anamneses" className="admin-sidebar-brand">
-              <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <path d="M16 30 C8 24 4 16 6 8 C8 2 16 0 22 4 C28 8 30 18 24 24 C21 27 18 29 16 30Z" fill="rgba(168,213,186,0.55)" />
-                <path d="M16 30 C14 22 12 14 14 8" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" />
-              </svg>
-              <div>
-                <div className="admin-sidebar-name">Nutrivivi</div>
-                <div className="admin-sidebar-badge">Painel Admin</div>
+    <div className="flex min-h-screen max-md:flex-col">
+      {/* Sidebar */}
+      <aside
+        className="
+          w-[220px] shrink-0 sticky top-0 h-screen overflow-hidden flex flex-col
+          bg-gradient-to-b from-forest via-evergreen to-[#243e2e]
+          max-md:w-full max-md:h-14 max-md:flex-row max-md:static
+        "
+        style={{
+          backgroundImage:
+            "linear-gradient(158deg, #1b3a2d 0%, #2d5a3d 55%, #243e2e 100%)",
+        }}
+      >
+        {/* subtle pattern overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a8d5ba' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E\")",
+          }}
+        />
+
+        {/* content */}
+        <div className="relative z-10 flex flex-col h-full px-[22px] py-8 max-md:flex-row max-md:items-center max-md:px-5 max-md:py-0 max-md:h-14">
+          {/* brand */}
+          <Link href="/painel/anamneses" className="flex items-center gap-2.5 no-underline mb-1.5 max-md:mb-0">
+            <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <path d="M16 30 C8 24 4 16 6 8 C8 2 16 0 22 4 C28 8 30 18 24 24 C21 27 18 29 16 30Z" fill="rgba(168,213,186,0.55)" />
+              <path d="M16 30 C14 22 12 14 14 8" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" />
+            </svg>
+            <div>
+              <div className="font-display text-xl font-medium text-white/95 leading-tight">Nutrivivi</div>
+              <div className="text-[9px] font-bold tracking-[0.1em] uppercase text-mint/65 max-md:hidden">
+                Painel Admin
               </div>
-            </Link>
-
-            <div className="admin-sidebar-botanical-wrap">
-              <SidebarBotanical />
             </div>
+          </Link>
 
-            <nav className="admin-nav-links">
-              <p className="admin-nav-section-label">Menu</p>
-              <Link
-                href="/painel/anamneses"
-                className={`admin-nav-link${
-                  pathname === "/painel/anamneses" || pathname?.startsWith("/painel/anamneses/")
-                    ? " active"
-                    : ""
-                }`}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                  <polyline points="14 2 14 8 20 8" />
-                  <line x1="16" y1="13" x2="8" y2="13" />
-                  <line x1="16" y1="17" x2="8" y2="17" />
-                  <polyline points="10 9 9 9 8 9" />
-                </svg>
-                Anamneses
-              </Link>
-            </nav>
-
-            <div className="admin-sidebar-footer">
-              <Link href="/" className="admin-sidebar-ext-link">↗ Formulário público</Link>
-              <button className="admin-sidebar-logout" onClick={logout}>Sair</button>
-            </div>
+          {/* botanical illustration — hidden on mobile */}
+          <div className="flex-1 flex items-center justify-center overflow-hidden max-md:hidden">
+            <SidebarBotanical />
           </div>
-        </aside>
 
-        <div className="admin-main">
-          <div className="admin-content">{children}</div>
+          {/* nav links */}
+          <nav className="flex flex-col gap-0.5 mb-2 max-md:flex-row max-md:gap-1 max-md:mb-0 max-md:flex-1 max-md:px-3">
+            <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-mint/40 mb-2 px-2 max-md:hidden">
+              Menu
+            </p>
+            <Link
+              href="/painel/anamneses"
+              className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-[13px] font-medium no-underline tracking-[0.01em] transition-all ${
+                isActive
+                  ? "bg-mint/[0.16] text-white"
+                  : "text-mint/70 hover:bg-mint/10 hover:text-white/90"
+              }`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              Anamneses
+            </Link>
+          </nav>
+
+          {/* footer */}
+          <div className="flex flex-col gap-2.5 pt-5 border-t border-mint/[0.12] max-md:flex-row max-md:pt-0 max-md:border-none max-md:items-center max-md:gap-2">
+            <Link
+              href="/"
+              className="text-[11px] text-mint/45 no-underline tracking-[0.04em] py-1 transition-colors hover:text-mint max-md:hidden"
+            >
+              ↗ Formulário público
+            </Link>
+            <button
+              onClick={logout}
+              className="bg-transparent border border-mint/20 text-mint/55 px-3.5 py-2 rounded-md font-body text-[11px] font-semibold tracking-[0.08em] uppercase cursor-pointer transition-all hover:border-mint/40 hover:text-mint text-center"
+            >
+              Sair
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <div className="flex-1 min-h-screen bg-paper overflow-x-hidden max-md:min-h-[calc(100vh-56px)]">
+        <div className="p-10 max-w-[1200px] mx-auto w-full max-md:px-5 max-md:py-6">
+          {children}
         </div>
       </div>
-    </>
+    </div>
   );
 }

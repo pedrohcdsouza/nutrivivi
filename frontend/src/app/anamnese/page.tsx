@@ -5,259 +5,12 @@ import { App, Form, Input, InputNumber, Select, Switch, Button } from "antd";
 import { submitAnamnese } from "@/lib/api/anamneses";
 import Link from "next/link";
 
-const css = `
-.page-root { display: flex; align-items: flex-start; min-height: 100vh; }
-
-.left-panel {
-  width: 360px;
-  min-width: 300px;
-  background: linear-gradient(158deg, var(--forest) 0%, var(--evergreen) 55%, #243e2e 100%);
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding: 40px 36px;
-  flex-shrink: 0;
-}
-.left-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a8d5ba' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
-.left-content { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
-
-.brand { display: flex; align-items: center; gap: 10px; }
-.brand-name {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.95);
-  letter-spacing: 0.04em;
-}
-.brand-illustration { flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 0; }
-.botanical-svg { width: 200px; height: auto; opacity: 0.85; animation: leafDrift 9s ease-in-out infinite; }
-
-.brand-copy { margin-bottom: 24px; }
-.brand-tagline {
-  font-family: var(--font-display);
-  font-size: 44px;
-  font-weight: 400;
-  line-height: 1.08;
-  color: white;
-  margin: 0 0 16px;
-  letter-spacing: -0.01em;
-}
-.brand-tagline em { font-style: italic; color: var(--mint); }
-.brand-desc { font-size: 13px; line-height: 1.75; color: rgba(168,213,186,0.75); margin: 0; }
-
-.admin-link {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: rgba(168,213,186,0.55);
-  text-decoration: none;
-  transition: color 0.2s;
-  padding: 8px 0;
-  display: inline-block;
-}
-.admin-link:hover { color: var(--mint); }
-
-.right-panel { flex: 1; min-height: 100vh; padding: 56px 64px; background: var(--cream); }
-
-.form-header { margin-bottom: 40px; }
-.form-main-title {
-  font-family: var(--font-display);
-  font-size: 42px;
-  font-weight: 400;
-  color: var(--forest);
-  margin: 0 0 8px;
-  letter-spacing: -0.02em;
-  animation: fadeInUp 0.7s ease both;
-}
-.form-subtitle {
-  font-size: 14px;
-  color: var(--bark);
-  margin: 0 0 24px;
-  animation: fadeInUp 0.7s ease 0.08s both;
-  opacity: 0;
-}
-.form-divider {
-  width: 56px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--fern), var(--mint));
-  border-radius: 2px;
-  animation: fadeInUp 0.7s ease 0.14s both;
-  opacity: 0;
-}
-
-.section-card {
-  background: white;
-  border-radius: 16px;
-  border: 1px solid var(--foam);
-  padding: 32px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.3s ease;
-  opacity: 0;
-  animation: fadeInUp 0.65s ease both;
-}
-.section-card:hover { box-shadow: var(--shadow-md); }
-.section-card.anim-1 { animation-delay: 0.2s; }
-.section-card.anim-2 { animation-delay: 0.3s; }
-.section-card.anim-3 { animation-delay: 0.38s; }
-.section-card.anim-4 { animation-delay: 0.44s; }
-.section-card.anim-5 { animation-delay: 0.5s; }
-.section-card.anim-6 { animation-delay: 0.56s; }
-
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--foam);
-}
-.section-number {
-  font-family: var(--font-display);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--sage);
-  letter-spacing: 0.08em;
-  background: var(--foam);
-  padding: 4px 10px;
-  border-radius: 20px;
-  min-width: 44px;
-  text-align: center;
-}
-.section-title {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 500;
-  color: var(--forest);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-.section-note { font-size: 13px; color: var(--bark); margin: 0 0 20px; font-style: italic; }
-
-.form-row { display: flex; gap: 16px; flex-wrap: wrap; }
-.form-row > .ant-form-item { flex: 1; min-width: 140px; }
-.form-row-three { display: flex; gap: 16px; flex-wrap: wrap; }
-.form-row-three > .ant-form-item { flex: 1; min-width: 120px; }
-
-.conditional-block {
-  background: var(--foam);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
-  border: 1px solid rgba(168,213,186,0.45);
-  animation: fadeIn 0.3s ease both;
-}
-
-.submit-area { padding: 32px 0 24px; text-align: center; animation: fadeInUp 0.65s ease 0.62s both; opacity: 0; }
-.submit-area .ant-btn { max-width: 420px; height: 52px !important; font-size: 13px !important; border-radius: 8px !important; }
-.submit-note { font-size: 12px; color: var(--mist); margin: 14px 0 0; }
-
-.success-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 70vh;
-  text-align: center;
-  animation: scaleIn 0.5s ease both;
-}
-.success-icon { margin-bottom: 24px; animation: fadeIn 0.6s ease 0.3s both; opacity: 0; }
-.success-title { font-family: var(--font-display); font-size: 40px; font-weight: 400; color: var(--forest); margin: 0 0 12px; }
-.success-desc { font-size: 15px; color: var(--bark); max-width: 440px; line-height: 1.75; margin: 0 0 32px; }
-
-.btn-outline {
-  background: none;
-  border: 1.5px solid var(--mint);
-  color: var(--fern);
-  padding: 10px 28px;
-  border-radius: 6px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-  transition: all 0.2s;
-}
-.btn-outline:hover { background: var(--foam); border-color: var(--fern); }
-
-.mobile-menu-wrap { display: none; position: relative; margin-left: auto; }
-.kebab-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  padding: 10px 8px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-.kebab-btn:hover { background: rgba(168,213,186,0.15); }
-.kebab-dot { display: block; width: 4px; height: 4px; border-radius: 50%; background: rgba(168,213,186,0.85); }
-
-.mobile-admin-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: white;
-  border-radius: 14px;
-  padding: 6px;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--foam);
-  min-width: 220px;
-  z-index: 200;
-  animation: fadeInUp 0.18s ease both;
-}
-.mobile-menu-item {
-  display: block;
-  padding: 12px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--charcoal);
-  text-decoration: none;
-  border-radius: 8px;
-  transition: background 0.15s, color 0.15s;
-  letter-spacing: 0.01em;
-}
-.mobile-menu-item:hover { background: var(--foam); color: var(--fern); }
-
-@media (max-width: 900px) {
-  .page-root { flex-direction: column; }
-  .left-panel { width: 100%; min-width: unset; height: auto; position: relative; padding: 28px 24px; }
-  .left-content { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 16px; height: auto; }
-  .brand-illustration { display: none; }
-  .brand-copy { margin-bottom: 0; }
-  .brand-tagline { font-size: 28px; }
-  .brand-desc { display: none; }
-  .admin-link { display: none; }
-  .mobile-menu-wrap { display: block; }
-  .right-panel { padding: 32px 24px; }
-  .form-main-title { font-size: 30px; }
-}
-@media (max-width: 600px) {
-  .section-card { padding: 24px 18px; }
-  .right-panel { padding: 24px 16px; }
-}
-`;
-
 const { TextArea } = Input;
 const { Option } = Select;
 
 function BotanicalIllustration() {
   return (
-    <svg viewBox="0 0 280 420" fill="none" className="botanical-svg" aria-hidden="true">
+    <svg viewBox="0 0 280 420" fill="none" className="w-[200px] h-auto opacity-[0.85] animate-leafDrift" aria-hidden="true">
       <path d="M140 410 C140 410 138 310 142 210 C146 130 140 70 140 48" stroke="rgba(168,213,186,0.35)" strokeWidth="1.5" />
       <path d="M140 230 C98 210 58 178 48 136 C38 92 76 80 108 100 C128 114 138 190 140 230Z" fill="rgba(168,213,186,0.12)" stroke="rgba(168,213,186,0.30)" strokeWidth="1.5" />
       <path d="M140 230 C118 198 80 158 56 136" stroke="rgba(168,213,186,0.20)" strokeWidth="1" />
@@ -278,18 +31,23 @@ function SectionCard({
   number,
   title,
   children,
-  className = "",
+  delay = 0,
 }: {
   number: number;
   title: string;
   children: React.ReactNode;
-  className?: string;
+  delay?: number;
 }) {
   return (
-    <div className={`section-card ${className}`}>
-      <div className="section-header">
-        <span className="section-number">{String(number).padStart(2, "0")}</span>
-        <h2 className="section-title">{title}</h2>
+    <div
+      className="bg-white rounded-2xl border border-foam p-8 mb-5 shadow-sm transition-shadow duration-300 hover:shadow-md animate-fadeInUp max-sm:px-4 max-sm:py-6"
+      style={{ animationDelay: `${delay}s` }}
+    >
+      <div className="flex items-center gap-3.5 mb-7 pb-5 border-b border-foam">
+        <span className="font-display text-[12px] font-semibold text-sage tracking-[0.08em] bg-foam px-2.5 py-1 rounded-full min-w-[44px] text-center">
+          {String(number).padStart(2, "0")}
+        </span>
+        <h2 className="font-display text-2xl font-medium text-forest m-0 tracking-[-0.01em]">{title}</h2>
       </div>
       <div>{children}</div>
     </div>
@@ -328,263 +86,304 @@ export default function AnamnesePage() {
   };
 
   return (
-    <>
-      <style>{css}</style>
-      <div className="page-root">
-        {/* ── Left Panel ── */}
-        <aside className="left-panel">
-          <div className="left-content">
-            <div className="brand">
-              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-                <path d="M16 30 C8 24 4 16 6 8 C8 2 16 0 22 4 C28 8 30 18 24 24 C21 27 18 29 16 30Z" fill="rgba(168,213,186,0.55)" />
-                <path d="M16 30 C14 22 12 14 14 8" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" />
-              </svg>
-              <Link href="/" className="brand-name" style={{ textDecoration: "none" }}>
-                Nutrivivi
-              </Link>
-            </div>
+    <div className="flex items-start min-h-screen max-md:flex-col">
+      {/* ── Left Panel ── */}
+      <aside
+        className="w-[360px] min-w-[300px] shrink-0 sticky top-0 h-screen overflow-hidden flex flex-col px-9 py-10 max-md:w-full max-md:min-w-0 max-md:h-auto max-md:static max-md:px-6 max-md:py-7"
+        style={{
+          background: "linear-gradient(158deg, #1b3a2d 0%, #2d5a3d 55%, #243e2e 100%)",
+        }}
+      >
+        {/* pattern overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a8d5ba' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E\")",
+          }}
+        />
 
-            <div className="brand-illustration">
-              <BotanicalIllustration />
-            </div>
-
-            <div className="brand-copy">
-              <h1 className="brand-tagline">
-                Nutrição que
-                <br />
-                <em>transforma</em>
-                <br />
-                vidas.
-              </h1>
-              <p className="brand-desc">
-                Preencha a anamnese para que sua nutricionista elabore um plano
-                alimentar totalmente personalizado para você.
-              </p>
-            </div>
-
-            <Link href="/login" className="admin-link">
-              Área da nutricionista →
+        <div className="relative z-10 flex flex-col h-full max-md:flex-row max-md:flex-wrap max-md:items-center max-md:gap-4 max-md:h-auto">
+          {/* brand */}
+          <div className="flex items-center gap-2.5">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <path d="M16 30 C8 24 4 16 6 8 C8 2 16 0 22 4 C28 8 30 18 24 24 C21 27 18 29 16 30Z" fill="rgba(168,213,186,0.55)" />
+              <path d="M16 30 C14 22 12 14 14 8" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" />
+            </svg>
+            <Link href="/" className="font-display text-[22px] font-medium text-white/95 tracking-[0.04em] no-underline">
+              Nutrivivi
             </Link>
-
-            <div className="mobile-menu-wrap" ref={menuRef}>
-              <button
-                className="kebab-btn"
-                onClick={() => setMenuOpen((o) => !o)}
-                aria-label="Abrir menu"
-                aria-expanded={menuOpen}
-              >
-                <span className="kebab-dot" />
-                <span className="kebab-dot" />
-                <span className="kebab-dot" />
-              </button>
-              {menuOpen && (
-                <div className="mobile-admin-menu" role="menu">
-                  <Link href="/login" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
-                    Entrar como nutricionista
-                  </Link>
-                  <Link href="/painel/anamneses" className="mobile-menu-item" onClick={() => setMenuOpen(false)}>
-                    Painel administrativo
-                  </Link>
-                </div>
-              )}
-            </div>
           </div>
-        </aside>
 
-        {/* ── Right Panel: Form ── */}
-        <main className="right-panel">
-          {success ? (
-            <div className="success-state">
-              <div className="success-icon">
-                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                  <circle cx="32" cy="32" r="30" stroke="#3a7d5a" strokeWidth="2" />
-                  <path d="M18 32 L28 42 L46 22" stroke="#3a7d5a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <h2 className="success-title">Anamnese enviada!</h2>
-              <p className="success-desc">
-                Sua nutricionista já recebeu seus dados e irá analisá-los em
-                breve. Aguarde o contato para iniciar sua jornada de saúde.
-              </p>
-              <button
-                className="btn-outline"
-                onClick={() => {
-                  setSuccess(false);
-                  form.resetFields();
-                }}
+          {/* illustration — hidden on mobile */}
+          <div className="flex-1 flex items-center justify-center py-2 max-md:hidden">
+            <BotanicalIllustration />
+          </div>
+
+          {/* tagline — hidden on mobile */}
+          <div className="mb-6 max-md:mb-0">
+            <h1 className="font-display text-[44px] font-normal leading-[1.08] text-white m-0 mb-4 tracking-[-0.01em] max-md:text-[28px]">
+              Nutrição que<br /><em className="italic text-mint">transforma</em><br />vidas.
+            </h1>
+            <p className="text-[13px] leading-[1.75] text-mint/75 m-0 max-md:hidden">
+              Preencha a anamnese para que sua nutricionista elabore um plano
+              alimentar totalmente personalizado para você.
+            </p>
+          </div>
+
+          {/* admin link — desktop only */}
+          <Link
+            href="/login"
+            className="text-[11px] font-semibold tracking-[0.1em] uppercase text-mint/55 no-underline py-2 inline-block transition-colors hover:text-mint max-md:hidden"
+          >
+            Área da nutricionista →
+          </Link>
+
+          {/* mobile kebab menu */}
+          <div className="hidden max-md:block relative ml-auto" ref={menuRef}>
+            <button
+              className="flex flex-col items-center justify-center gap-1 bg-transparent border-none p-2.5 cursor-pointer rounded-lg transition-colors hover:bg-mint/15"
+              onClick={() => setMenuOpen((o) => !o)}
+              aria-label="Abrir menu"
+              aria-expanded={menuOpen}
+            >
+              <span className="block w-1 h-1 rounded-full bg-mint/85" />
+              <span className="block w-1 h-1 rounded-full bg-mint/85" />
+              <span className="block w-1 h-1 rounded-full bg-mint/85" />
+            </button>
+            {menuOpen && (
+              <div
+                className="absolute top-[calc(100%+8px)] right-0 bg-white rounded-2xl p-1.5 shadow-lg border border-foam min-w-[220px] z-[200] animate-fadeInUp"
+                role="menu"
               >
-                Enviar outra resposta
-              </button>
+                <Link
+                  href="/login"
+                  className="block px-4 py-3 text-[13px] font-medium text-charcoal no-underline rounded-lg transition-colors hover:bg-foam hover:text-fern"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Entrar como nutricionista
+                </Link>
+                <Link
+                  href="/painel/anamneses"
+                  className="block px-4 py-3 text-[13px] font-medium text-charcoal no-underline rounded-lg transition-colors hover:bg-foam hover:text-fern"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Painel administrativo
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Right Panel: Form ── */}
+      <main className="flex-1 min-h-screen px-16 py-14 bg-cream max-md:px-6 max-md:py-8 max-sm:px-4 max-sm:py-6">
+        {success ? (
+          <div className="flex flex-col items-center justify-center min-h-[70vh] text-center animate-scaleIn">
+            <div className="mb-6 animate-fadeInUp" style={{ animationDelay: "0.3s" }}>
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="30" stroke="#3a7d5a" strokeWidth="2" />
+                <path d="M18 32 L28 42 L46 22" stroke="#3a7d5a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
-          ) : (
-            <>
-              <div className="form-header">
-                <h1 className="form-main-title">Anamnese Nutricional</h1>
-                <p className="form-subtitle">
-                  Suas respostas são confidenciais e essenciais para um
-                  atendimento verdadeiramente personalizado.
-                </p>
-                <div className="form-divider" />
-              </div>
-
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                initialValues={{
-                  does_physical_activity: false,
-                  uses_supplement: false,
-                  sleep_quality: 3,
-                  anxiety_level: 3,
-                  stress_level: 3,
-                }}
+            <h2 className="font-display text-[40px] font-normal text-forest m-0 mb-3">Anamnese enviada!</h2>
+            <p className="text-[15px] text-bark max-w-[440px] leading-[1.75] m-0 mb-8">
+              Sua nutricionista já recebeu seus dados e irá analisá-los em
+              breve. Aguarde o contato para iniciar sua jornada de saúde.
+            </p>
+            <button
+              className="bg-transparent border-[1.5px] border-mint text-fern px-7 py-2.5 rounded-lg font-body text-[13px] font-medium cursor-pointer tracking-[0.04em] transition-all hover:bg-foam hover:border-fern"
+              onClick={() => {
+                setSuccess(false);
+                form.resetFields();
+              }}
+            >
+              Enviar outra resposta
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-10">
+              <h1 className="font-display text-[42px] font-normal text-forest m-0 mb-2 tracking-[-0.02em] animate-fadeInUp max-md:text-[30px]">
+                Anamnese Nutricional
+              </h1>
+              <p
+                className="text-sm text-bark m-0 mb-6 animate-fadeInUp"
+                style={{ animationDelay: "0.08s" }}
               >
-                {/* 01 */}
-                <SectionCard number={1} title="Identificação do Paciente" className="anim-1">
-                  <Form.Item name="full_name" label="Nome Completo" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <Input size="large" placeholder="Seu nome completo" />
-                  </Form.Item>
-                  <div className="form-row">
-                    <Form.Item name="age_years" label="Idade" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                      <InputNumber size="large" style={{ width: "100%" }} min={0} placeholder="Sua idade" />
-                    </Form.Item>
-                    <Form.Item name="profession" label="Profissão" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                      <Input size="large" placeholder="Sua profissão" />
-                    </Form.Item>
-                  </div>
-                  <Form.Item name="consultation_reason" label="Motivo da Consulta" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <TextArea rows={3} placeholder="Por que você busca uma consulta nutricional?" />
-                  </Form.Item>
-                </SectionCard>
+                Suas respostas são confidenciais e essenciais para um
+                atendimento verdadeiramente personalizado.
+              </p>
+              <div
+                className="w-14 h-[3px] rounded-sm bg-gradient-to-r from-fern to-mint animate-fadeInUp"
+                style={{ animationDelay: "0.14s" }}
+              />
+            </div>
 
-                {/* 02 */}
-                <SectionCard number={2} title="Antropometria Inicial" className="anim-2">
-                  <div className="form-row">
-                    <Form.Item name="weight_kg" label="Peso Atual (kg)" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                      <InputNumber size="large" min={1} max={500} step={0.1} style={{ width: "100%" }} placeholder="Ex: 70.5" />
-                    </Form.Item>
-                    <Form.Item name="height_cm" label="Altura (cm)" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                      <InputNumber size="large" min={30} max={300} style={{ width: "100%" }} placeholder="Ex: 170" />
-                    </Form.Item>
-                  </div>
-                </SectionCard>
-
-                {/* 03 */}
-                <SectionCard number={3} title="Saúde e Estilo de Vida" className="anim-3">
-                  <div className="form-row-three">
-                    <Form.Item name="sleep_quality" label="Qualidade do Sono" rules={[{ required: true }]}>
-                      <Select size="large">
-                        <Option value={1}>1 — Muito ruim</Option>
-                        <Option value={2}>2 — Ruim</Option>
-                        <Option value={3}>3 — Regular</Option>
-                        <Option value={4}>4 — Boa</Option>
-                        <Option value={5}>5 — Excelente</Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item name="anxiety_level" label="Nível de Ansiedade" rules={[{ required: true }]}>
-                      <Select size="large">
-                        <Option value={1}>1 — Muito baixo</Option>
-                        <Option value={2}>2 — Baixo</Option>
-                        <Option value={3}>3 — Moderado</Option>
-                        <Option value={4}>4 — Alto</Option>
-                        <Option value={5}>5 — Muito alto</Option>
-                      </Select>
-                    </Form.Item>
-                    <Form.Item name="stress_level" label="Nível de Estresse" rules={[{ required: true }]}>
-                      <Select size="large">
-                        <Option value={1}>1 — Muito baixo</Option>
-                        <Option value={2}>2 — Baixo</Option>
-                        <Option value={3}>3 — Moderado</Option>
-                        <Option value={4}>4 — Alto</Option>
-                        <Option value={5}>5 — Muito alto</Option>
-                      </Select>
-                    </Form.Item>
-                  </div>
-                  <Form.Item name="does_physical_activity" label="Pratica Atividade Física?" valuePropName="checked">
-                    <Switch />
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onFinish}
+              initialValues={{
+                does_physical_activity: false,
+                uses_supplement: false,
+                sleep_quality: 3,
+                anxiety_level: 3,
+                stress_level: 3,
+              }}
+            >
+              {/* 01 */}
+              <SectionCard number={1} title="Identificação do Paciente" delay={0.2}>
+                <Form.Item name="full_name" label="Nome Completo" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <Input size="large" placeholder="Seu nome completo" />
+                </Form.Item>
+                <div className="form-row flex gap-4 flex-wrap">
+                  <Form.Item name="age_years" label="Idade" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                    <InputNumber size="large" style={{ width: "100%" }} min={0} placeholder="Sua idade" />
                   </Form.Item>
-                  <Form.Item noStyle shouldUpdate={(prev, curr) => prev.does_physical_activity !== curr.does_physical_activity}>
-                    {({ getFieldValue }) =>
-                      getFieldValue("does_physical_activity") ? (
-                        <div className="conditional-block">
-                          <div className="form-row">
-                            <Form.Item name="activity_modality" label="Modalidade" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                              <Input placeholder="Ex: Musculação, Corrida" />
-                            </Form.Item>
-                            <Form.Item name="activity_weekly_frequency" label="Frequência Semanal" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                              <InputNumber min={1} max={14} style={{ width: "100%" }} placeholder="Vezes/semana" />
-                            </Form.Item>
-                          </div>
-                          <div className="form-row">
-                            <Form.Item name="activity_workout_time" label="Horário do Treino" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                              <Input placeholder="Ex: 18:30" />
-                            </Form.Item>
-                            <Form.Item name="activity_duration_minutes" label="Duração (minutos)" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
-                              <InputNumber min={1} max={300} style={{ width: "100%" }} placeholder="Ex: 60" />
-                            </Form.Item>
-                          </div>
-                        </div>
-                      ) : null
-                    }
+                  <Form.Item name="profession" label="Profissão" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                    <Input size="large" placeholder="Sua profissão" />
                   </Form.Item>
-                </SectionCard>
-
-                {/* 04 */}
-                <SectionCard number={4} title="Suplementação Atual" className="anim-4">
-                  <Form.Item name="uses_supplement" label="Utiliza Algum Suplemento?" valuePropName="checked">
-                    <Switch />
-                  </Form.Item>
-                  <Form.Item noStyle shouldUpdate={(prev, curr) => prev.uses_supplement !== curr.uses_supplement}>
-                    {({ getFieldValue }) =>
-                      getFieldValue("uses_supplement") ? (
-                        <Form.Item name="supplements" label="Quais suplementos?" rules={[{ required: true, message: "Obrigatório" }]}>
-                          <TextArea rows={3} placeholder="Liste os suplementos que você utiliza" />
-                        </Form.Item>
-                      ) : null
-                    }
-                  </Form.Item>
-                </SectionCard>
-
-                {/* 05 */}
-                <SectionCard number={5} title="Recordatório Alimentar" className="anim-5">
-                  <p className="section-note">Descreva o que você costuma comer em cada refeição.</p>
-                  <Form.Item name="recall_breakfast" label="Café da Manhã" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <TextArea rows={2} placeholder="O que você costuma comer no café da manhã?" />
-                  </Form.Item>
-                  <Form.Item name="recall_lunch" label="Almoço" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <TextArea rows={2} placeholder="O que você costuma almoçar?" />
-                  </Form.Item>
-                  <Form.Item name="recall_snack" label="Lanche" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <TextArea rows={2} placeholder="Lanche da tarde ou outros?" />
-                  </Form.Item>
-                  <Form.Item name="recall_dinner" label="Jantar" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <TextArea rows={2} placeholder="O que você costuma jantar?" />
-                  </Form.Item>
-                  <Form.Item name="recall_supper_other" label="Ceia / Outros" rules={[{ required: true, message: "Obrigatório" }]}>
-                    <TextArea rows={2} placeholder="Ceia ou outras refeições?" />
-                  </Form.Item>
-                </SectionCard>
-
-                {/* 06 */}
-                <SectionCard number={6} title="Observações Adicionais" className="anim-6">
-                  <Form.Item name="additional_observations" label="Há algo mais que gostaria de compartilhar? (Opcional)">
-                    <TextArea rows={4} placeholder="Alergias, intolerâncias, medicamentos, ou qualquer informação relevante..." />
-                  </Form.Item>
-                </SectionCard>
-
-                <div className="submit-area">
-                  <Button type="primary" htmlType="submit" size="large" loading={loading} block>
-                    Enviar Anamnese
-                  </Button>
-                  <p className="submit-note">
-                    Seus dados são protegidos e utilizados exclusivamente para fins nutricionais.
-                  </p>
                 </div>
-              </Form>
-            </>
-          )}
-        </main>
-      </div>
-    </>
+                <Form.Item name="consultation_reason" label="Motivo da Consulta" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <TextArea rows={3} placeholder="Por que você busca uma consulta nutricional?" />
+                </Form.Item>
+              </SectionCard>
+
+              {/* 02 */}
+              <SectionCard number={2} title="Antropometria Inicial" delay={0.3}>
+                <div className="form-row flex gap-4 flex-wrap">
+                  <Form.Item name="weight_kg" label="Peso Atual (kg)" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                    <InputNumber size="large" min={1} max={500} step={0.1} style={{ width: "100%" }} placeholder="Ex: 70.5" />
+                  </Form.Item>
+                  <Form.Item name="height_cm" label="Altura (cm)" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                    <InputNumber size="large" min={30} max={300} style={{ width: "100%" }} placeholder="Ex: 170" />
+                  </Form.Item>
+                </div>
+              </SectionCard>
+
+              {/* 03 */}
+              <SectionCard number={3} title="Saúde e Estilo de Vida" delay={0.38}>
+                <div className="form-row-three flex gap-4 flex-wrap">
+                  <Form.Item name="sleep_quality" label="Qualidade do Sono" rules={[{ required: true }]}>
+                    <Select size="large">
+                      <Option value={1}>1 — Muito ruim</Option>
+                      <Option value={2}>2 — Ruim</Option>
+                      <Option value={3}>3 — Regular</Option>
+                      <Option value={4}>4 — Boa</Option>
+                      <Option value={5}>5 — Excelente</Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item name="anxiety_level" label="Nível de Ansiedade" rules={[{ required: true }]}>
+                    <Select size="large">
+                      <Option value={1}>1 — Muito baixo</Option>
+                      <Option value={2}>2 — Baixo</Option>
+                      <Option value={3}>3 — Moderado</Option>
+                      <Option value={4}>4 — Alto</Option>
+                      <Option value={5}>5 — Muito alto</Option>
+                    </Select>
+                  </Form.Item>
+                  <Form.Item name="stress_level" label="Nível de Estresse" rules={[{ required: true }]}>
+                    <Select size="large">
+                      <Option value={1}>1 — Muito baixo</Option>
+                      <Option value={2}>2 — Baixo</Option>
+                      <Option value={3}>3 — Moderado</Option>
+                      <Option value={4}>4 — Alto</Option>
+                      <Option value={5}>5 — Muito alto</Option>
+                    </Select>
+                  </Form.Item>
+                </div>
+                <Form.Item name="does_physical_activity" label="Pratica Atividade Física?" valuePropName="checked">
+                  <Switch />
+                </Form.Item>
+                <Form.Item noStyle shouldUpdate={(prev, curr) => prev.does_physical_activity !== curr.does_physical_activity}>
+                  {({ getFieldValue }) =>
+                    getFieldValue("does_physical_activity") ? (
+                      <div className="bg-foam rounded-xl p-5 mb-4 border border-mint/45 animate-[fadeIn_0.3s_ease_both]">
+                        <div className="form-row flex gap-4 flex-wrap">
+                          <Form.Item name="activity_modality" label="Modalidade" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                            <Input placeholder="Ex: Musculação, Corrida" />
+                          </Form.Item>
+                          <Form.Item name="activity_weekly_frequency" label="Frequência Semanal" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                            <InputNumber min={1} max={14} style={{ width: "100%" }} placeholder="Vezes/semana" />
+                          </Form.Item>
+                        </div>
+                        <div className="form-row flex gap-4 flex-wrap">
+                          <Form.Item name="activity_workout_time" label="Horário do Treino" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                            <Input placeholder="Ex: 18:30" />
+                          </Form.Item>
+                          <Form.Item name="activity_duration_minutes" label="Duração (minutos)" rules={[{ required: true, message: "Obrigatório" }]} style={{ flex: 1 }}>
+                            <InputNumber min={1} max={300} style={{ width: "100%" }} placeholder="Ex: 60" />
+                          </Form.Item>
+                        </div>
+                      </div>
+                    ) : null
+                  }
+                </Form.Item>
+              </SectionCard>
+
+              {/* 04 */}
+              <SectionCard number={4} title="Suplementação Atual" delay={0.44}>
+                <Form.Item name="uses_supplement" label="Utiliza Algum Suplemento?" valuePropName="checked">
+                  <Switch />
+                </Form.Item>
+                <Form.Item noStyle shouldUpdate={(prev, curr) => prev.uses_supplement !== curr.uses_supplement}>
+                  {({ getFieldValue }) =>
+                    getFieldValue("uses_supplement") ? (
+                      <Form.Item name="supplements" label="Quais suplementos?" rules={[{ required: true, message: "Obrigatório" }]}>
+                        <TextArea rows={3} placeholder="Liste os suplementos que você utiliza" />
+                      </Form.Item>
+                    ) : null
+                  }
+                </Form.Item>
+              </SectionCard>
+
+              {/* 05 */}
+              <SectionCard number={5} title="Recordatório Alimentar" delay={0.5}>
+                <p className="text-[13px] text-bark mb-5 italic">Descreva o que você costuma comer em cada refeição.</p>
+                <Form.Item name="recall_breakfast" label="Café da Manhã" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <TextArea rows={2} placeholder="O que você costuma comer no café da manhã?" />
+                </Form.Item>
+                <Form.Item name="recall_lunch" label="Almoço" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <TextArea rows={2} placeholder="O que você costuma almoçar?" />
+                </Form.Item>
+                <Form.Item name="recall_snack" label="Lanche" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <TextArea rows={2} placeholder="Lanche da tarde ou outros?" />
+                </Form.Item>
+                <Form.Item name="recall_dinner" label="Jantar" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <TextArea rows={2} placeholder="O que você costuma jantar?" />
+                </Form.Item>
+                <Form.Item name="recall_supper_other" label="Ceia / Outros" rules={[{ required: true, message: "Obrigatório" }]}>
+                  <TextArea rows={2} placeholder="Ceia ou outras refeições?" />
+                </Form.Item>
+              </SectionCard>
+
+              {/* 06 */}
+              <SectionCard number={6} title="Observações Adicionais" delay={0.56}>
+                <Form.Item name="additional_observations" label="Há algo mais que gostaria de compartilhar? (Opcional)">
+                  <TextArea rows={4} placeholder="Alergias, intolerâncias, medicamentos, ou qualquer informação relevante..." />
+                </Form.Item>
+              </SectionCard>
+
+              <div className="pt-8 pb-6 text-center animate-fadeInUp" style={{ animationDelay: "0.62s" }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  block
+                  style={{ maxWidth: 420, height: 52, fontSize: 13, borderRadius: 8 }}
+                >
+                  Enviar Anamnese
+                </Button>
+                <p className="text-xs text-mist mt-3.5 m-0">
+                  Seus dados são protegidos e utilizados exclusivamente para fins nutricionais.
+                </p>
+              </div>
+            </Form>
+          </>
+        )}
+      </main>
+    </div>
   );
 }

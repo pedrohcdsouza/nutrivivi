@@ -1,19 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap");
 @import "tailwindcss";
 
-/* ─── Design Tokens ─────────────────────────────────────────── */
-:root {
-  --forest: #1b3a2d;
-  --evergreen: #2d5a3d;
-  --fern: #3a7d5a;
-  --sage: #52a678;
-  --mint: #a8d5ba;
-  --foam: #e2f2e9;
-  --cream: #faf7f2;
-  --paper: #f0ece3;
-  --charcoal: #1a2319;
-  --bark: #4a6357;
-  --mist: #8aaa96;
+@theme {
+  --color-forest: #1b3a2d;
+  --color-evergreen: #2d5a3d;
+  --color-fern: #3a7d5a;
+  --color-sage: #52a678;
+  --color-mint: #a8d5ba;
+  --color-foam: #e2f2e9;
+  --color-cream: #faf7f2;
+  --color-paper: #f0ece3;
+  --color-charcoal: #1a2319;
+  --color-bark: #4a6357;
+  --color-mist: #8aaa96;
 
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-body: "DM Sans", system-ui, -apple-system, sans-serif;
@@ -36,8 +35,8 @@ html {
 body {
   margin: 0;
   font-family: var(--font-body);
-  color: var(--charcoal);
-  background: var(--cream);
+  color: var(--color-charcoal);
+  background: var(--color-cream);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -51,7 +50,7 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--mint);
+  background: var(--color-mint);
   border-radius: 10px;
 }
 
@@ -62,7 +61,7 @@ body {
   font-weight: 600 !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
-  color: var(--bark) !important;
+  color: var(--color-bark) !important;
 }
 
 .ant-input,
@@ -72,7 +71,7 @@ body {
 .ant-select-selection-item,
 .ant-select-selection-placeholder {
   font-family: var(--font-body) !important;
-  color: var(--charcoal) !important;
+  color: var(--color-charcoal) !important;
 }
 
 .ant-btn {
@@ -88,7 +87,7 @@ body {
 }
 
 .ant-switch-checked {
-  background: var(--fern) !important;
+  background: var(--color-fern) !important;
 }
 
 /* ─── Animations ────────────────────────────────────────────── */
@@ -128,4 +127,24 @@ body {
   50% {
     transform: translateY(-10px) rotate(1.5deg);
   }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.7s ease both;
+}
+.animate-scaleIn {
+  animation: scaleIn 0.5s ease both;
+}
+.animate-leafDrift {
+  animation: leafDrift 9s ease-in-out infinite;
+}
+
+/* ─── Form row helpers ──────────────────────────────────────── */
+.form-row > .ant-form-item {
+  flex: 1;
+  min-width: 140px;
+}
+.form-row-three > .ant-form-item {
+  flex: 1;
+  min-width: 120px;
 }

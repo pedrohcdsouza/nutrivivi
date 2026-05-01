@@ -8,6 +8,21 @@ import AdminLayout from "@/components/layout/AdminLayout";
 
 const { Search } = Input;
 
+const STATUS_MAP: Record<string, { className: string; label: string }> = {
+  sent: {
+    className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-[0.06em] uppercase bg-[#e8f5ee] text-[#2d6a4f]",
+    label: "Enviado",
+  },
+  failed: {
+    className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-[0.06em] uppercase bg-[#fde8e8] text-[#9b3a3a]",
+    label: "Falha",
+  },
+  pending: {
+    className: "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-[0.06em] uppercase bg-[#fef3e2] text-[#92610a]",
+    label: "Pendente",
+  },
+};
+
 export default function PainelAnamneses() {
   const { message } = App.useApp();
   const [data, setData] = useState([]);
@@ -42,7 +57,9 @@ export default function PainelAnamneses() {
       title: "Paciente",
       dataIndex: "full_name",
       key: "full_name",
-      render: (text: string) => <span className="patient-name">{text}</span>,
+      render: (text: string) => (
+        <span className="font-semibold text-forest text-sm">{text}</span>
+      ),
     },
     {
       title: "Enviado em",
@@ -75,16 +92,8 @@ export default function PainelAnamneses() {
       dataIndex: "notification_status",
       key: "notification_status",
       render: (status: string) => {
-        const map: Record<string, { cls: string; label: string }> = {
-          sent: { cls: "status-badge status-sent", label: "Enviado" },
-          failed: { cls: "status-badge status-failed", label: "Falha" },
-          pending: { cls: "status-badge status-pending", label: "Pendente" },
-        };
-        const s = map[status] ?? {
-          cls: "status-badge status-pending",
-          label: status,
-        };
-        return <span className={s.cls}>{s.label}</span>;
+        const s = STATUS_MAP[status] ?? STATUS_MAP.pending;
+        return <span className={s.className}>{s.label}</span>;
       },
       width: 130,
     },
@@ -97,7 +106,7 @@ export default function PainelAnamneses() {
             type="link"
             size="small"
             style={{
-              color: "var(--fern)",
+              color: "var(--color-fern)",
               fontWeight: 600,
               fontSize: 12,
               letterSpacing: "0.04em",
@@ -114,19 +123,13 @@ export default function PainelAnamneses() {
 
   return (
     <AdminLayout>
-      <div className="admin-page-header">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            flexWrap: "wrap",
-            gap: 16,
-          }}
-        >
+      <div className="mb-8">
+        <div className="flex justify-between items-end flex-wrap gap-4">
           <div>
-            <h1 className="admin-page-title">Anamneses</h1>
-            <p className="admin-page-subtitle">
+            <h1 className="font-display text-[38px] font-normal text-forest tracking-[-0.015em] m-0 leading-tight">
+              Anamneses
+            </h1>
+            <p className="text-[13px] text-bark mt-1.5 m-0">
               {total !== null
                 ? `${total} ${total === 1 ? "registro" : "registros"} encontrados`
                 : "Gerencie os questionários recebidos"}
@@ -145,7 +148,7 @@ export default function PainelAnamneses() {
         </div>
       </div>
 
-      <div className="admin-table-wrap">
+      <div className="bg-white rounded-2xl border border-foam overflow-hidden shadow-sm">
         <Table
           columns={columns}
           dataSource={data}
